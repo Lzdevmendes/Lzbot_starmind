@@ -1,6 +1,6 @@
-# CLAUDE.md
+# PROJETO LZBOT STARMIND
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Documentação técnica do sistema de análise de produtos com IA.
 
 ## Project Overview
 

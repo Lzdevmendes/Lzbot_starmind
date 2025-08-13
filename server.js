@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/scrape', async (req, res) => {
   try {
-    console.log('Scraping products...');
+    console.log('Loading products from diravena.com...');
     
     const response = await axios.get('https://diravena.com/products.json', {
       headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -77,12 +77,12 @@ app.get('/api/scrape', async (req, res) => {
     
     res.json({
       success: true,
-      message: `${products.length} produtos extraídos com sucesso`,
+      message: `${products.length} produtos carregados com sucesso`,
       data: products
     });
     
   } catch (error) {
-    console.error('Scraping error:', error.message);
+    console.error('Error loading products:', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -182,7 +182,7 @@ Responda em português brasileiro.`;
     });
 
   } catch (error) {
-    console.error('Analysis error:', error.message);
+    console.error('AI Analysis error:', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });

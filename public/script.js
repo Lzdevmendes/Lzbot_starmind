@@ -3,9 +3,8 @@ let loading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAIStatus();
-    loadProducts();
+    autoLoadProducts();
     
-    document.getElementById('scrapeBtn').onclick = scrapeProducts;
     document.getElementById('refreshBtn').onclick = loadProducts;
     document.getElementById('searchBtn').onclick = searchProducts;
     document.getElementById('searchInput').onkeypress = (e) => {
@@ -38,20 +37,25 @@ async function checkAIStatus() {
     document.getElementById('aiStatus').textContent = providers.length > 0 ? providers.join(', ') : 'Não configurado';
 }
 
-async function scrapeProducts() {
+async function autoLoadProducts() {
     if (loading) return;
     loading = true;
     
-    showToast('Extraindo produtos...');
-    const result = await api('/scrape');
+    showToast('Carregando produtos...');
+    
+    let result = await api('/products');
+    if (!result.success || result.data.length === 0) {
+        showToast('Buscando produtos online...');
+        result = await api('/scrape');
+    }
     
     if (result.success) {
         products = result.data;
         renderProducts();
         updateStats(result);
-        showToast(`${result.data.length} produtos extraídos!`, 'success');
+        showToast(`${result.data.length} produtos carregados!`, 'success');
     } else {
-        showToast('Erro na extração', 'error');
+        showToast('Erro ao carregar produtos', 'error');
     }
     
     loading = false;

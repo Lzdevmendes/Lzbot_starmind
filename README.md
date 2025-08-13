@@ -118,11 +118,11 @@ GET /api/ai-status
 
 ## 📋 Exemplos práticos
 
-### Como extrair produtos?
+### Como ver produtos?
 1. Acesse http://localhost:3000
-2. Clique em **"Extrair Produtos"**
-3. Aguarde o sistema buscar dados do diravena.com
-4. Produtos aparecerão na tela automaticamente
+2. O sistema carrega produtos automaticamente
+3. Use o botão **"Atualizar Lista"** para recarregar
+4. Produtos aparecem na tela automaticamente
 
 ### Como analisar um produto?
 1. Após extrair produtos, clique em **"Analisar com IA"** em qualquer produto
@@ -264,7 +264,7 @@ npm run dev
 
 ## 📞 Suporte e contato
 
-- **Documentação técnica**: `CLAUDE.md`
+- **Documentação técnica**: `PROJETO_DOCUMENTACAO.md`
 - **Logs do sistema**: `app.log`
 - **Problemas**: Verifique console do navegador (F12)
 

@@ -18,9 +18,9 @@ Seja bem-vindo ao **LzBot StarMind**! Este guia foi criado especialmente para de
 
 ### 🔄 Fluxo de Funcionamento
 
-1. **Usuário clica** em "Extrair Produtos"
-2. **Frontend** envia requisição para `/api/scrape`
-3. **Backend** vai ao site diravena.com e extrai produtos
+1. **Sistema carrega** automaticamente ao abrir
+2. **Frontend** envia requisição para `/api/products`
+3. **Backend** verifica produtos salvos, se não há, busca do diravena.com
 4. **Backend** salva produtos na memória
 5. **Backend** retorna produtos para o frontend
 6. **Frontend** exibe produtos na tela
