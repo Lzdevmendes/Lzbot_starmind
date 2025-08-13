@@ -5,13 +5,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**LzBot StarMind** é um sistema web completo para análise de produtos com IA e web scraping, desenvolvido com foco educacional para desenvolvedores júnior. O projeto extrai produtos do diravena.com e permite análises inteligentes usando OpenAI GPT ou Google Gemini.
+**LzBot StarMind** é um sistema web completo para análise de produtos com IA e web scraping. O projeto extrai produtos do diravena.com e oferece análises inteligentes usando OpenAI GPT com fallback inteligente.
 
-### Arquitetura Simples
-- **Backend Node.js**: Express.js na raiz com APIs REST bem documentadas
-- **Frontend**: HTML/CSS/JS vanilla na pasta `/public` (sem frameworks complexos)
-- **Web Scraper**: Extração inteligente usando API Shopify + fallback HTML
-- **Integração IA**: Suporte duplo para OpenAI GPT e Google Gemini
+### Arquitetura Atual
+- **Backend Node.js**: Express.js na raiz com APIs REST
+- **Frontend**: HTML/CSS/JS vanilla na pasta `/public`
+- **Web Scraper**: Extração via API Shopify (`/products.json`)
+- **Integração IA**: OpenAI GPT com sistema de fallback inteligente
 
 ## Development Commands
 
@@ -31,103 +31,89 @@ npx kill-port 3000
 
 ## Environment Setup
 
-1. Copie `.env.example` para `.env` 
-2. Configure pelo menos uma API de IA:
+1. Crie arquivo `.env` na raiz do projeto
+2. Configure a API OpenAI:
    ```
-   OPENAI_API_KEY=sua_chave_openai
-   GEMINI_API_KEY=sua_chave_gemini  
+   OPENAI_API_KEY=sua_chave_openai_aqui
    PORT=3000
    ```
-3. As IAs são opcionais - sistema funciona sem elas
+3. Sistema funciona mesmo sem API (usa fallback inteligente)
 
-## API Endpoints (Bem Documentados)
+## API Endpoints Implementados
 
 ### Products
-- `GET /api/products` - Lista produtos (suporte a search, limit, sortBy)
-- `GET /api/products/:id` - Produto específico por ID
-- `GET /api/products-stats` - Estatísticas detalhadas
-
-### Scraping  
-- `GET /api/scrape` - Extrai produtos do diravena.com (API Shopify + fallback)
+- `GET /api/products` - Lista produtos com filtros (search, limit)
+- `GET /api/scrape` - Extrai produtos do diravena.com via Shopify API
 
 ### AI Analysis
-- `POST /api/analyze` - Analisa produto com IA (body: productData, aiProvider)
-- `GET /api/ai-status` - Status das APIs configuradas
+- `POST /api/analyze` - Analisa produto com OpenAI (com fallback)
+- `GET /api/ai-status` - Status da configuração OpenAI
 
-## Code Structure (Educacional)
+## Estrutura Atual do Projeto
 
-### Backend (Comentado para Júnior)
 ```
-server.js          # Servidor principal com comentários explicativos
-scraper.js         # Web scraping com estratégia dupla
-ai.js              # Integração OpenAI/Gemini  
-products.js        # CRUD de produtos
-```
-
-### Frontend (Vanilla JS)
-```
-public/
-├── index.html     # Interface responsiva moderna
-├── style.css      # Design com gradientes e animações
-└── script.js      # Lógica bem estruturada e comentada
+Lzbot_starmind/
+├── server.js              # Servidor Express completo
+├── package.json            # Dependências do projeto
+├── .env                    # Configurações (não commitado)
+├── CLAUDE.md              # Documentação técnica
+├── README.md              # Documentação do usuário
+└── public/
+    ├── index.html         # Interface principal
+    ├── style.css          # Tema azul StarMind
+    └── script.js          # Lógica frontend
 ```
 
-## Key Features
+## Funcionalidades Implementadas
 
-### Web Scraping Inteligente
-- **Primeira tentativa**: API oficial Shopify (`/products.json`)
-- **Fallback**: HTML scraping com seletores adaptativos
-- **Dados ricos**: ID, preços, variantes, disponibilidade, imagens
+### Web Scraping
+- Extração via API Shopify (`/products.json`)
+- 30+ produtos do diravena.com
+- Dados: ID, título, preço, imagem, descrição, disponibilidade
 
-### Sistema de IA Flexível  
-- Suporte a múltiplos providers (OpenAI/Gemini)
-- Análises detalhadas de produtos
-- Fallback gracioso se APIs não configuradas
+### Sistema de IA
+- OpenAI GPT-3.5-turbo para análises
+- Fallback inteligente quando quota excedida
+- Análises profissionais simuladas
+- Provider: 'sistema-inteligente' no fallback
 
-### Interface Moderna
-- Design responsivo (mobile-first)
-- Loading states e feedback visual
-- Modal para análises
-- Sistema de notificações toast
-- Busca e filtros em tempo real
+### Interface
+- Tema azul StarMind AI (#0c72ed)
+- Design responsivo mobile-first
+- Sistema de busca em tempo real
+- Loading states otimizados
+- Auto-refresh a cada 5 minutos
 
-## Development Workflow
+## Stack Tecnológica
 
-### Para Novos Desenvolvedores
-1. **Leia**: `README.md` - Visão geral completa
-2. **Estude**: `GUIA_DESENVOLVEDOR.md` - Tutorial passo-a-passo  
-3. **Pratique**: Modifique cores, adicione campos, crie rotas
-4. **Evolua**: Implemente banco de dados, testes, deploy
+### Backend
+- **Express.js** - Framework web
+- **Axios** - Cliente HTTP
+- **Cheerio** - HTML parsing (não usado atualmente)
+- **OpenAI SDK** - Integração IA
+- **dotenv** - Variáveis de ambiente
+- **CORS** - Configuração de CORS
 
-### Debugging
-- **Logs**: Winston integrado (console + arquivo)
-- **Frontend**: F12 > Console para debug JavaScript
-- **Backend**: Terminal mostra todas as requisições
-- **Network**: F12 > Network para investigar APIs
+### Frontend
+- **HTML5** - Estrutura
+- **CSS3** - Estilização com tema StarMind
+- **JavaScript Vanilla** - Lógica
+- **Font Awesome** - Ícones
 
-## Technologies (Modernas mas Simples)
+### Ferramentas
+- **Nodemon** - Auto-reload desenvolvimento
+- **kill-port** - Gerenciamento de portas
 
-- **Backend**: Express.js, Axios, Cheerio, Winston
-- **Frontend**: Vanilla JS (sem frameworks), CSS Grid, Font Awesome
-- **AI**: OpenAI SDK, Google Generative AI
-- **Tools**: Nodemon, kill-port
+## Configuração de Deploy
 
-## Important Notes for Development
+- **Variáveis**: Apenas OPENAI_API_KEY e PORT
+- **CORS**: Configurado para cross-origin
+- **Logs**: Console integrado
+- **Erros**: Tratamento completo implementado
+- **Plataformas**: Heroku, Vercel, Railway, DigitalOcean
 
-- Código extensivamente comentado para aprendizado
-- Tratamento de erros robusto em toda aplicação  
-- Logs detalhados para debug fácil
-- Estrutura modular para fácil extensão
-- README e documentação completos
-- Exemplos práticos de uso
-- Exercícios sugeridos para evolução
+## URL de Desenvolvimento
 
-## Deployment Ready
+**http://localhost:3000** - Servidor local funcionando
 
-- Variáveis de ambiente configuradas
-- Sistema de logs para produção
-- Tratamento de erros adequado
-- CORS configurado
-- Pronto para Heroku, Vercel, Railway
-
-O projeto serve como **excelente base educacional** para desenvolvedores júnior aprenderem fullstack com Node.js!
+Sistema completo e pronto para produção!
