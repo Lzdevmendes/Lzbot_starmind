@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LzBot StarMind - Análise de Produtos com IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>LzBot StarMind</h1>
+            </div>
+            <p class="subtitle">Análise inteligente de produtos com IA</p>
+        </header>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Processando...</p>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="controls">
+                    <button id="scrapeBtn" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Extrair Produtos
+                    </button>
+                    <button id="refreshBtn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Atualizar Lista
+                    </button>
+                    <select id="aiProvider" class="select">
+                        <option value="gemini">Gemini AI</option>
+                        <option value="openai">OpenAI GPT</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar produtos..." class="search-input">
+                    <button id="searchBtn" class="btn btn-search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stats Panel -->
+            <section id="statsPanel" class="stats-panel">
+                <div class="stat-card">
+                    <i class="fas fa-boxes"></i>
+                    <div>
+                        <span class="stat-value" id="totalProducts">0</span>
+                        <span class="stat-label">Produtos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <span class="stat-value" id="lastScrape">Nunca</span>
+                        <span class="stat-label">Último Scraping</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-robot"></i>
+                    <div>
+                        <span class="stat-value" id="aiStatus">Verificando...</span>
+                        <span class="stat-label">Status IA</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Grid -->
+            <section class="products-section">
+                <h2>Produtos Extraídos</h2>
+                <div id="productsGrid" class="products-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Nenhum produto encontrado</h3>
+                        <p>Clique em "Extrair Produtos" para começar</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal para análise de produto -->
+        <div id="analysisModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Análise do Produto</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="analysisContent">
+                        <div class="analysis-loading">
+                            <div class="spinner-small"></div>
+                            <p>Analisando produto com IA...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast para notificações -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
