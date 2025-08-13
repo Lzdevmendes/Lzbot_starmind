@@ -2,8 +2,10 @@ let products = [];
 let loading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    checkAIStatus();
-    autoLoadProducts();
+    loadAllProducts();
+    
+    // Auto-refresh a cada 5 minutos
+    setInterval(loadAllProducts, 5 * 60 * 1000);
     
     document.getElementById('refreshBtn').onclick = loadProducts;
     document.getElementById('searchBtn').onclick = searchProducts;
@@ -27,106 +29,115 @@ async function api(url, data = null) {
     return response.json();
 }
 
-async function checkAIStatus() {
-    const status = await api('/ai-status');
-    const providers = [];
-    
-    if (status.data.openai.available) providers.push('OpenAI');
-    if (status.data.gemini.available) providers.push('Gemini');
-    
-    document.getElementById('aiStatus').textContent = providers.length > 0 ? providers.join(', ') : 'Não configurado';
-}
 
-async function autoLoadProducts() {
+async function loadAllProducts() {
     if (loading) return;
     loading = true;
+    setLoading(true);
     
-    showToast('Carregando produtos...');
-    
-    let result = await api('/products');
-    if (!result.success || result.data.length === 0) {
-        showToast('Buscando produtos online...');
-        result = await api('/scrape');
-    }
-    
-    if (result.success) {
-        products = result.data;
-        renderProducts();
-        updateStats(result);
-        showToast(`${result.data.length} produtos carregados!`, 'success');
-    } else {
+    try {
+        let result = await api('/products');
+        if (!result.success || result.data.length === 0) {
+            result = await api('/scrape');
+        }
+        
+        if (result.success) {
+            products = result.data;
+            renderProducts(products);
+            updateStats(result);
+        }
+    } catch (error) {
         showToast('Erro ao carregar produtos', 'error');
+    } finally {
+        loading = false;
+        setLoading(false);
     }
-    
-    loading = false;
 }
 
 async function loadProducts() {
     if (loading) return;
     loading = true;
+    setLoading(true);
     
-    const result = await api('/products');
-    if (result.success) {
-        products = result.data;
-        renderProducts();
-        updateStats(result);
-        showToast(`${result.data.length} produtos carregados`);
-    } else {
-        showToast('Erro ao carregar produtos', 'error');
+    try {
+        const result = await api('/scrape');
+        if (result.success) {
+            products = result.data;
+            renderProducts(products);
+            updateStats(result);
+            showToast(`${result.data.length} produtos atualizados!`, 'success');
+        } else {
+            showToast('Erro ao atualizar produtos', 'error');
+        }
+    } catch (error) {
+        showToast('Erro ao conectar com servidor', 'error');
+    } finally {
+        loading = false;
+        setLoading(false);
     }
-    
-    loading = false;
 }
 
 async function searchProducts() {
     const search = document.getElementById('searchInput').value.trim();
     
     if (!search) {
-        renderProducts();
+        renderProducts(products);
         return;
     }
     
+    if (loading) return;
     loading = true;
-    const result = await api(`/products?search=${search}`);
-    if (result.success) {
-        products = result.data;
-        renderProducts();
-        showToast(`${result.count} produtos encontrados`);
+    setLoading(true);
+    
+    try {
+        const result = await api(`/products?search=${search}`);
+        if (result.success) {
+            renderProducts(result.data);
+            showToast(`${result.count} produtos encontrados`);
+        }
+    } catch (error) {
+        showToast('Erro na busca', 'error');
+    } finally {
+        loading = false;
+        setLoading(false);
     }
-    loading = false;
 }
 
 async function analyzeProduct(product) {
     openModal();
     showAnalysisLoading();
     
-    const result = await api('/analyze', {
-        productData: product,
-        aiProvider: 'gemini'
-    });
-    
-    if (result.success) {
-        showAnalysisResult(result.data.analysis, product);
-    } else {
-        showAnalysisError(result.error);
+    try {
+        const result = await api('/analyze', {
+            productData: product,
+            aiProvider: 'openai'
+        });
+        
+        if (result.success) {
+            showAnalysisResult(result.data.analysis, product);
+        } else {
+            showAnalysisError(result.error || 'Erro na análise');
+        }
+    } catch (error) {
+        showAnalysisError('Erro de conexão com a IA');
     }
 }
 
-function renderProducts() {
+function renderProducts(productsToRender = []) {
     const grid = document.getElementById('productsGrid');
     
-    if (products.length === 0) {
+    if (productsToRender.length === 0) {
         grid.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-box-open"></i>
                 <h3>Nenhum produto encontrado</h3>
-                <p>Clique em "Extrair Produtos" para começar</p>
+                <p>Tente buscar por outros termos</p>
             </div>
         `;
         return;
     }
     
-    grid.innerHTML = products.map(product => `
+    grid.innerHTML = productsToRender.map(product => `
         <div class="product-card">
             ${product.image ? `<img src="${product.image}" alt="${product.title}" class="product-image" onerror="this.style.display='none'">` : ''}
             <h3 class="product-title">${product.title}</h3>
@@ -144,7 +155,7 @@ function renderProducts() {
 
 function updateStats(data = null) {
     if (data) {
-        document.getElementById('totalProducts').textContent = data.totalProducts || 0;
+        document.getElementById('totalProducts').textContent = data.data ? data.data.length : (data.totalProducts || 0);
         document.getElementById('lastScrape').textContent = data.lastScrape 
             ? new Date(data.lastScrape).toLocaleString('pt-BR')
             : 'Nunca';
@@ -154,11 +165,16 @@ function updateStats(data = null) {
 }
 
 function setLoading(isLoading) {
-    document.getElementById('loadingOverlay').style.display = isLoading ? 'flex' : 'none';
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+    }
     
-    document.getElementById('scrapeBtn').disabled = isLoading;
-    document.getElementById('refreshBtn').disabled = isLoading;
-    document.getElementById('searchBtn').disabled = isLoading;
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    if (refreshBtn) refreshBtn.disabled = isLoading;
+    if (searchBtn) searchBtn.disabled = isLoading;
 }
 
 function showToast(message, type = 'info') {
